@@ -13,6 +13,8 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
-    "vue/max-attributes-per-line": 0
+    "vue/max-attributes-per-line": 0,
+    "eol-last": 0,
+    "no-console": 0
   }
 }

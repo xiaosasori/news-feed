@@ -12,7 +12,8 @@ export default {
       { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: '//fonts.googleapis.com/css?family=Roboto:400,500,700,400italic|Material+Icons' }
     ]
   },
   /*
@@ -60,6 +61,10 @@ export default {
     '/api/': {
       target: 'https://newsapi.org/v2/',
       pathRewrite: { '^/api/': '' }
+    },
+    '/register/': {
+      target: 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=AIzaSyDRgFWjOkmpkZmeCLdBG1aODldWBIt0ZVU',
+      pathRewrite: { '^/register/': '' }
     }
   },
   env: {
