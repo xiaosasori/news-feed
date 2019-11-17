@@ -9,8 +9,17 @@
         NuxtNews
       </nuxt-link>
       <div class="md-toolbar-section-end">
-        <md-button @click="$router.push('/login')">login</md-button>
-        <md-button @click="$router.push('/register')">register</md-button>
+        <template v-if="isAuthenticated">
+          <md-button>
+            <md-avatar><img :src="user.avatar" :alt="user.email"></md-avatar>
+            {{ user.email }}
+          </md-button>
+          <md-button>Logout</md-button>
+        </template>
+        <template v-else>
+          <md-button @click="$router.push('/login')">login</md-button>
+          <md-button @click="$router.push('/register')">register</md-button>
+        </template>
         <md-button class="md-accent" @click="showRightSidepanel=true">Categories</md-button>
       </div>
     </md-toolbar>
@@ -44,9 +53,9 @@
       <md-list>
         <md-subheader class="md-primary">Categories</md-subheader>
         <md-list-item v-for="(newsCategory, index) in newsCategories" :key="index" @click="loadCategory(newsCategory.path)">
-          <md-icon :class="newsCategory.path === category ? 'md-primary' : ''">{{newsCategory.icon}}</md-icon>
+          <md-icon :class="newsCategory.path === category ? 'md-primary' : ''">{{ newsCategory.icon }}</md-icon>
           <span class="md-list-item-text">
-            {{newsCategory.name}}
+            {{ newsCategory.name }}
           </span>
         </md-list-item>
       </md-list>
@@ -106,11 +115,9 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 export default {
-  components: {
-
-  },
+  components: {},
   data: () => ({
     showLeftSidepanel: false,
     showRightSidepanel: false,
@@ -128,21 +135,32 @@ export default {
   //   const topHeadlines = await app.$axios.$get('/api/top-headlines?country=us')
   //   return { headlines: topHeadlines.articles }
   // },
-  async fetch ({ store }) {
-    await store.dispatch('loadHeadlines', `/api/top-headlines?country=${store.state.country}&category=${store.state.category}`)
+  computed: {
+    ...mapState(['loading', 'headlines', 'category', 'country', 'user']),
+    ...mapGetters(['isAuthenticated'])
   },
   watch: {
     async country () {
-      await this.$store.dispatch('loadHeadlines', `/api/top-headlines?country=${this.country}&category=${this.category}`)
+      await this.$store.dispatch(
+        'loadHeadlines',
+        `/api/top-headlines?country=${this.country}&category=${this.category}`
+      )
     }
   },
-  computed: {
-    ...mapState(['loading', 'headlines', 'category', 'country'])
+  async fetch ({ store }) {
+    console.log('fetch')
+    await store.dispatch(
+      'loadHeadlines',
+      `/api/top-headlines?country=${store.state.country}&category=${store.state.category}`
+    )
   },
   methods: {
     async loadCategory (category) {
       this.$store.commit('setCategory', category)
-      await this.$store.dispatch('loadHeadlines', `/api/top-headlines?country=${this.country}&category=${this.category}`)
+      await this.$store.dispatch(
+        'loadHeadlines',
+        `/api/top-headlines?country=${this.country}&category=${this.category}`
+      )
     },
     changeCountry (country) {
       this.$store.commit('setCountry', country)

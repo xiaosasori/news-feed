@@ -32,7 +32,9 @@ export default {
   */
   plugins: [
     { src: '~/plugins/vue-material' },
-    { src: '~/plugins/axios' }
+    { src: '~/plugins/axios' },
+    { src: '~/plugins/firestore' },
+    { src: '~/plugins/vuelidate' }
   ],
   /*
   ** Nuxt.js dev-modules
@@ -63,8 +65,12 @@ export default {
       pathRewrite: { '^/api/': '' }
     },
     '/register/': {
-      target: 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=AIzaSyDRgFWjOkmpkZmeCLdBG1aODldWBIt0ZVU',
+      target: 'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDRgFWjOkmpkZmeCLdBG1aODldWBIt0ZVU',
       pathRewrite: { '^/register/': '' }
+    },
+    '/login/': {
+      target: 'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDRgFWjOkmpkZmeCLdBG1aODldWBIt0ZVU',
+      pathRewrite: { '^/login/': '' }
     }
   },
   env: {
