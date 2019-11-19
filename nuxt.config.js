@@ -1,6 +1,9 @@
 
 export default {
   mode: 'universal',
+  router: {
+    middleware: 'check-auth'
+  },
   /*
   ** Headers of the page
   */

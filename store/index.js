@@ -1,3 +1,4 @@
+import { saveUserData, clearUserData } from '~/utils'
 import db from '~/plugins/firestore'
 
 export const state = () => ({
@@ -27,7 +28,9 @@ export const mutations = {
   },
   setUser (state, user) {
     state.user = user
-  }
+  },
+  clearToken: state => (state.token = ''),
+  clearUser: state => (state.user = null)
 }
 
 export const actions = {
@@ -40,7 +43,6 @@ export const actions = {
   async authenticateUser ({ commit }, userPayload) {
     try {
       commit('setLoading', true)
-      console.log('auth', userPayload)
       const authUserData = await this.$axios.$post(`/${userPayload.action}/`, {
         email: userPayload.email,
         password: userPayload.password,
@@ -60,10 +62,19 @@ export const actions = {
       commit('setUser', user)
       commit('setToken', authUserData.idToken)
       commit('setLoading', false)
+      saveUserData(authUserData, user)
     } catch (err) {
       console.error('err', err)
       commit('setLoading', false)
     }
+  },
+  setLogoutTimer ({ dispatch }, interval) {
+    setTimeout(() => dispatch('logoutUser'), interval)
+  },
+  logoutUser ({ commit }) {
+    commit('clearToken')
+    commit('clearUser')
+    clearUserData()
   }
 }
 

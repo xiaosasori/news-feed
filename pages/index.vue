@@ -14,7 +14,7 @@
             <md-avatar><img :src="user.avatar" :alt="user.email"></md-avatar>
             {{ user.email }}
           </md-button>
-          <md-button>Logout</md-button>
+          <md-button @click="logoutUser">Logout</md-button>
         </template>
         <template v-else>
           <md-button @click="$router.push('/login')">login</md-button>
@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapState, mapGetters, mapActions } from 'vuex'
 export default {
   components: {},
   data: () => ({
@@ -155,6 +155,7 @@ export default {
     )
   },
   methods: {
+    ...mapActions(['logoutUser']),
     async loadCategory (category) {
       this.$store.commit('setCategory', category)
       await this.$store.dispatch(
