@@ -40,6 +40,37 @@
           <md-option value="ru">Russia</md-option>
         </md-select>
       </md-field>
+      <!-- Default markup (if feed empty) -->
+      <md-empty-state
+        class="md-primary" v-if="feed.length === 0 && !user"
+        md-icon="bookmarks" md-label="Nothing in Feed"
+        md-description="Login to bookmark headlines"
+      >
+        <md-button class="md-primary md-raised" @click="$router.push('/login')">Login</md-button>
+      </md-empty-state>
+      <md-empty-state v-else-if="feed.length === 0"
+        class="md-accent" md-icon="bookmark_outline"
+        md-label="Nothing in Feed"
+        md-description="Anything you bookmark will be safely stored here"
+      >
+      </md-empty-state>
+      <!-- Default markup (if feed empty) -->
+      <!-- Feed Content -->
+      <md-list v-else class="md-triple-line" v-for="headline in feed" :key="headline.id">
+        <md-list-item>
+          <md-avatar><img :src="headline.urlToImage" :alt="headline.title"></md-avatar>
+          <div class="md-list-item-text">
+            <span><a :href="headline.url" target="_blank">{{ headline.title }}</a></span>
+            <span>{{ headline.source.name }}</span>
+            <span>View Comments</span>
+          </div>
+          <md-button @click="removeHeadlineFromFeed(headline)" class="md-icon-button md-list-action">
+            <md-icon class="md-accent">delete</md-icon>
+          </md-button>
+        </md-list-item>
+        <md-divider class="md-inset"></md-divider>
+      </md-list>
+      <!-- Feed Content -->
     </md-drawer>
     <!-- News feed drawer (left) -->
     <!-- Categories drawer (right) -->
@@ -96,12 +127,12 @@
               {{ headline.description }}
             </md-card-content>
             <md-card-actions>
-              <md-button class="md-icon-button">
+              <md-button @click="addHeadlineToFeed(headline)" class="md-icon-button" :class="isInFeed(headline.title)">
                 <md-icon>
                   bookmark
                 </md-icon>
               </md-button>
-              <md-button class="md-icon-button">
+              <md-button @click="saveHeadline(headline)" class="md-icon-button">
                 <md-icon>
                   message
                 </md-icon>
@@ -136,7 +167,7 @@ export default {
   //   return { headlines: topHeadlines.articles }
   // },
   computed: {
-    ...mapState(['loading', 'headlines', 'category', 'country', 'user']),
+    ...mapState(['loading', 'headlines', 'feed', 'category', 'country', 'user']),
     ...mapGetters(['isAuthenticated'])
   },
   watch: {
@@ -148,11 +179,12 @@ export default {
     }
   },
   async fetch ({ store }) {
-    console.log('fetch')
+    console.log('fetch index')
     await store.dispatch(
       'loadHeadlines',
       `/api/top-headlines?country=${store.state.country}&category=${store.state.category}`
     )
+    await store.dispatch('loadUserFeed')
   },
   methods: {
     ...mapActions(['logoutUser']),
@@ -165,6 +197,23 @@ export default {
     },
     changeCountry (country) {
       this.$store.commit('setCountry', country)
+    },
+    async addHeadlineToFeed (headline) {
+      if (this.user) {
+        await this.$store.dispatch('addHeadlineToFeed', headline)
+      }
+    },
+    isInFeed (title) {
+      const inFeed = this.feed.findIndex(headline => headline.title === title) > -1
+      return inFeed ? 'md-primary' : ''
+    },
+    async removeHeadlineFromFeed (headline) {
+      await this.$store.dispatch('removeHeadlineFromFeed', headline)
+    },
+    async saveHeadline (headline) {
+      await this.$store.dispatch('saveHeadline', headline).then(() => {
+        this.$router.push(`/headlines/${headline.slug}`)
+      })
     }
   }
 }
