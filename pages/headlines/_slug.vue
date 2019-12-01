@@ -3,7 +3,7 @@
     <div class="md-layout-item md-size-75 md-small-size-80 md-xsmalls-size-100">
       <md-card>
         <md-card-media style="height: 300px" md-ratio="16:9">
-          <img :src="headline.urlToImage" :alt="headline.title">
+          <img :src="headline.urlToImage" :alt="headline.title" />
         </md-card-media>
         <md-card-header>
           <div class="md-title">
@@ -31,19 +31,29 @@
           <md-textarea v-model="text" :disabled="loading || !user"></md-textarea>
           <md-icon>description</md-icon>
         </md-field>
-        <md-button class="md-primary md-raised" type="submit" :disabled="loading || !user">Send comment</md-button>
+        <md-button
+          class="md-primary md-raised"
+          type="submit"
+          :disabled="loading || !user"
+        >Send comment</md-button>
       </form>
       <!-- Comment -->
       <md-list class="md-triple-line" style="margin-top: 1em">
         <md-list-item v-for="comment in headline.comments" :key="comment.id">
-          <md-avatar><img :src="comment.user.avatar" :alt="comment.user.username"></md-avatar>
+          <md-avatar>
+            <img :src="comment.user.avatar" :alt="comment.user.username" />
+          </md-avatar>
           <div class="md-list-item-text">
             <span>{{ comment.user.username }}</span>
-            <span>{{ comment.user.publishedAt }}</span>
+            <span>{{ comment.user.publishedAt | commentTimeToNow }}</span>
             <p>{{ comment.text }}</p>
           </div>
           <md-badge class="md-primary" md-position="bottom" :md-content="comment.likes" />
-          <md-button @click="likeComment(comment.id)" class="md-icon-button" :disabled="loading || !user">
+          <md-button
+            @click="likeComment(comment.id)"
+            class="md-icon-button"
+            :disabled="loading || !user"
+          >
             <md-icon>thumb_up</md-icon>
           </md-button>
         </md-list-item>
@@ -90,5 +100,4 @@ export default {
 </script>
 
 <style>
-
 </style>

@@ -1,5 +1,6 @@
 import slugify from 'slugify'
 import { saveUserData, clearUserData } from '~/utils'
+import defaultImage from '~/assets/default-image.jpg'
 import db from '~/plugins/firestore'
 
 export const state = () => ({
@@ -10,7 +11,8 @@ export const state = () => ({
   feed: [],
   category: '',
   country: 'us',
-  user: null
+  user: null,
+  source: ''
 })
 
 export const mutations = {
@@ -38,6 +40,9 @@ export const mutations = {
   setFeed (state, headlines) {
     state.feed = headlines
   },
+  setSource (state, source) {
+    state.source = source
+  },
   clearToken: state => (state.token = ''),
   clearUser: state => (state.user = null),
   clearFeed: state => (state.feed = [])
@@ -53,6 +58,9 @@ export const actions = {
         remove: /[^a-zA-Z0-9 -]/g,
         lower: true
       })
+      if (!article.urlToImage || !article.urlToImage.endsWith('.jpg')) {
+        article.urlToImage = defaultImage
+      }
       return { ...article, slug }
     })
     commit('setLoading', false)
@@ -101,15 +109,17 @@ export const actions = {
       console.log('loadUserFeed logged in')
       const feedRef = db.collection(`users/${state.user.email}/feed`)
       await feedRef.onSnapshot((querySnapshot) => {
-        let headlines = []
-        console.log('querySnapshot', querySnapshot)
-        querySnapshot.forEach((doc) => {
-          headlines.push(doc.data())
-        })
-        if (querySnapshot.empty) {
-          headlines = []
+        if (querySnapshot && querySnapshot.exists) {
+          let headlines = []
+          console.log('querySnapshot', querySnapshot)
+          querySnapshot.forEach((doc) => {
+            headlines.push(doc.data())
+          })
+          if (querySnapshot.empty) {
+            headlines = []
+          }
+          commit('setFeed', headlines)
         }
-        commit('setFeed', headlines)
       })
     }
   },
@@ -117,7 +127,7 @@ export const actions = {
     const headlineRef = db.collection('headlines').doc(headline.slug)
     let headlineId
     await headlineRef.get().then((doc) => {
-      if (doc.exists) {
+      if (doc && doc.exists) {
         headlineId = doc.id
       }
     })
@@ -130,7 +140,7 @@ export const actions = {
     const commentsRef = db.collection(`headlines/${headlineSlug}/comments`).orderBy('likes', 'desc')
     let loadedHeadline = {}
     await headlineRef.get().then(async (doc) => {
-      if (doc.exists) {
+      if (doc && doc.exists) {
         loadedHeadline = doc.data()
         await commentsRef.get().then((querySnapshot) => {
           if (querySnapshot.empty) {

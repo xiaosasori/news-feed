@@ -41,6 +41,10 @@
       </form>
       <md-snackbar :md-active.sync="isAuthenticated">Login successfully</md-snackbar>
     </md-card>
+    <!-- Back button -->
+    <md-button class="md-fab md-fab-bottom-right md-fixed md-primary" @click="$router.go(-1)">
+      <md-icon>arrow_back</md-icon>
+    </md-button>
   </div>
 </template>
 

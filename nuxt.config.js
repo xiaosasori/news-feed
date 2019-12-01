@@ -37,7 +37,8 @@ export default {
     { src: '~/plugins/vue-material' },
     { src: '~/plugins/axios' },
     { src: '~/plugins/firestore' },
-    { src: '~/plugins/vuelidate' }
+    { src: '~/plugins/vuelidate' },
+    { src: '~/plugins/time-filters' }
   ],
   /*
   ** Nuxt.js dev-modules
